@@ -11,6 +11,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Map;
@@ -21,11 +23,17 @@ public class AddressBook {
 	
 	private final Map<String, HashMap<String, String>> addresses = new HashMap<>();
 	private String ADDRESS_BOOK_FILE = "./src/edu/umgc/swen656/aop2/addresses.xml";
+	private String LOG_FILE = "./src/edu/umgc/swen656/aop2/logs.txt";
 	
 	public AddressBook() {
 		loadCurrentAddressBook();
 		printIntro();
-		showUI();
+		try {
+			showUI();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void loadCurrentAddressBook() {
@@ -69,7 +77,7 @@ public class AddressBook {
 		System.out.println("~*~ Address Book ~*~");
 	}
 	
-	private void showUI() {
+	private void showUI() throws IOException {
 		Scanner sc = new Scanner(System.in);
 		
 		System.out.println("Pick an action by typing a number then hit Enter/Return.");
@@ -90,15 +98,15 @@ public class AddressBook {
 		sc.close();
 	}
 	
-	private void doAction(int action) {
+	private void doAction(int action) throws IOException {
 		switch (action) {
 	        case 1: printAddressBook();
 	        	break;
 	        case 2: addContact();
 	        	break;
-	        case 3:  System.out.println("Update contact.");
+	        case 3: updateContact();
 	        	break;
-	        case 4:  System.out.println("Delete contact.");
+	        case 4: deleteContact();
 	        	break;
 	        default: System.out.println("Invalid action.");
 	        break;
@@ -226,6 +234,156 @@ public class AddressBook {
 	    System.out.println("\n===== New record added");
 	    System.out.println("Contact name: " + fullName);
 	    System.out.println("Address: " + street + ", " + city + " " + state + " " + zip + " " + phoneNumber);
+	    String message = "New record added: ";
+	    message += fullName + " " +
+	    		street + " " + 
+	    		city + " " +
+	    		state + " " +
+	    		zip + " " +
+	    		phoneNumber;
+	    String logMessage = prepareLogMessage(message);
+	    saveLog(logMessage);
+	}
+	
+	private void updateContact() throws IOException {
+		printAddressBook();
+		
+		Scanner sc = new Scanner(System.in);
+		System.out.println("\n----- Update contact");
+		System.out.println("Contact ID:");
+		String contactId = sc.nextLine();
+		
+		if (addresses.containsKey(contactId)) {
+			HashMap<String, String> contact = addresses.get(contactId);
+			String fullName = contact.get("fullName");
+			String street = contact.get("street");
+			String city = contact.get("city");
+			String state = contact.get("state");
+			String zip = contact.get("zip");
+			String phoneNumber = contact.get("phoneNumber");
+			
+			System.out.println("Street: " + street);
+		    String newStreet = sc.nextLine();
+		    // If user types in a new name, update the current name.
+		    if (!isEmpty(newStreet)) {
+		    	contact.put("street", newStreet);
+		    	street = newStreet;
+		    }
+		    
+		    System.out.println("City: " + city);
+		    String newCity = sc.nextLine();
+		    // If user types in a new name, update the current name.
+		    if (!isEmpty(newCity)) {
+		    	contact.put("city", newCity);
+		    	city = newCity;
+		    }
+		    
+		    System.out.println("State: " + state);
+		    String newState = sc.nextLine();
+		    // If user types in a new value, update.
+		    if (!isEmpty(newState)) {
+		    	while (!isValidState(newState)) {
+			    	System.out.println("Invalid state. State must have 2 uppercase letters.");
+			    	System.out.println("State (format: AB):");
+			    	newState = sc.nextLine();
+			    }
+		    	contact.put("state", newState);
+		    	state = newState;
+		    }
+		    
+		    System.out.println("Zip: " + zip);
+		    String newZip = sc.nextLine();
+		    // If user types in a new value, update.
+		    if (!isEmpty(newZip)) {
+		    	while (!isValidZip(newZip)) {
+			    	System.out.println("Invalid zip. Zip must have 5 digits.");
+			    	System.out.println("Zip (format: 12345):");
+			    	newZip = sc.nextLine();
+			    }
+		    	contact.put("zip", newZip);
+		    	zip = newZip;
+		    }
+		    
+		    System.out.println("Phone number: " + phoneNumber);
+		    String newPhoneNumber = sc.nextLine();
+		    // If user types in a new value, update.
+		    if (!isEmpty(newPhoneNumber)) {
+		    	while (!isValidPhoneNumber(newPhoneNumber)) {
+			    	System.out.println("Invalid phone number. Phone number must have 10 digits.");
+			    	System.out.println("Phone number:");
+			    	newPhoneNumber = sc.nextLine();
+			    }
+		    	newPhoneNumber = addHyphen(newPhoneNumber);
+		    	contact.put("phoneNumber", newPhoneNumber);
+		    	phoneNumber = newPhoneNumber;
+		    }
+		    
+			sc.close();
+			
+			String message = "Record updated: ";
+			message += fullName + " " + 
+					street + ", " + city + " " + state + " " + zip + " " + 
+					phoneNumber;
+			
+			updateAddressBook();
+			
+			String logMessage = prepareLogMessage(message);
+			saveLog(logMessage);
+			
+			return;
+		}
+		
+		System.out.println("Contact ID does not exist in the address book.");
+	}
+	
+	private void deleteContact() throws IOException {
+		printAddressBook();
+		
+		Scanner sc = new Scanner(System.in);
+		System.out.println("\n----- Delete contact");
+		System.out.println("Contact ID:");
+		String contactId = sc.nextLine();
+		sc.close();
+		
+		if (addresses.containsKey(contactId)) {
+			HashMap<String, String> contact = addresses.get(contactId);
+			String fullName = contact.get("fullName");
+			String street = contact.get("street");
+			String city = contact.get("city");
+			String state = contact.get("state");
+			String zip = contact.get("zip");
+			String phoneNumber = contact.get("phoneNumber");
+			String message = "Record deleted: ";
+			message += fullName + " " + 
+					street + ", " + city + " " + state + " " + zip + " " + 
+					phoneNumber;
+			
+			addresses.remove(contactId);
+			updateAddressBook();
+			
+			String logMessage = prepareLogMessage(message);
+			saveLog(logMessage);
+			
+			return;
+		}
+		
+		System.out.println("Contact ID does not exist in the address book.");
+	}
+	
+	private String prepareLogMessage(String message) {
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new java.util.Date());
+		String logMessage = timeStamp + " ";
+		logMessage += message;
+		return logMessage;
+	}
+	
+	private void saveLog(String log) {
+		try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(LOG_FILE, true)))) {
+		    out.println(log);
+		    System.out.println(log);
+		} catch (IOException e) {
+		    System.err.println(e);
+		}
 	}
 	
 	private String addHyphen(String phoneNumber) {
