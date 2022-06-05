@@ -1,0 +1,57 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<addressBook>
+	<contact>
+		<contactId>cccddd</contactId>
+		<zip>1111</zip>
+		<phoneNumber>240-888-3400</phoneNumber>
+		<city>Rockville</city>
+		<street>1 Here Dr</street>
+		<fullName>Sally Jones</fullName>
+		<state>MD</state>
+	</contact>
+	<contact>
+		<contactId>gdidtl</contactId>
+		<zip>12345</zip>
+		<phoneNumber>240-123-1234</phoneNumber>
+		<city>asfasdf</city>
+		<street>asfasdf</street>
+		<fullName>asfasdfs</fullName>
+		<state>AE</state>
+	</contact>
+	<contact>
+		<contactId>fkhmtn</contactId>
+		<zip>24234</zip>
+		<phoneNumber>213-460-1000</phoneNumber>
+		<city>SLDKFJSDK</city>
+		<street>DLKFJDS</street>
+		<fullName>asfasdfsadf DJKNFJD</fullName>
+		<state>LD</state>
+	</contact>
+	<contact>
+		<contactId>eeefff</contactId>
+		<zip>21726</zip>
+		<phoneNumber>240-777-9999</phoneNumber>
+		<city>Largo</city>
+		<street>333 Elm St</street>
+		<fullName>Mohamad Smith</fullName>
+		<state>MD</state>
+	</contact>
+	<contact>
+		<contactId>aaabbb</contactId>
+		<zip>20876</zip>
+		<phoneNumber>301-555-1234</phoneNumber>
+		<city>Coolsville</city>
+		<street>123 Main St</street>
+		<fullName>Bill Smith</fullName>
+		<state>MD</state>
+	</contact>
+	<contact>
+		<contactId>tuogjn</contactId>
+		<zip>14543</zip>
+		<phoneNumber>090-245-1430</phoneNumber>
+		<city>This Time</city>
+		<street>For</street>
+		<fullName>REal</fullName>
+		<state>IE</state>
+	</contact>
+</addressBook>
