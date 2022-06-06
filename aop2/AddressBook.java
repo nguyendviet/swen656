@@ -11,8 +11,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Map;
@@ -21,9 +19,10 @@ import java.util.Scanner;
 
 public class AddressBook {
 	
+	public static String logMessage;
 	private final Map<String, HashMap<String, String>> addresses = new HashMap<>();
 	private String ADDRESS_BOOK_FILE = "./src/edu/umgc/swen656/aop2/addresses.xml";
-	private String LOG_FILE = "./src/edu/umgc/swen656/aop2/logs.txt";
+//	private String LOG_FILE = "./src/edu/umgc/swen656/aop2/logs.txt";
 	
 	public AddressBook() {
 		loadCurrentAddressBook();
@@ -31,7 +30,6 @@ public class AddressBook {
 		try {
 			showUI();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -227,7 +225,6 @@ public class AddressBook {
 	    try {
 			updateAddressBook();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	    
@@ -241,8 +238,7 @@ public class AddressBook {
 	    		state + " " +
 	    		zip + " " +
 	    		phoneNumber;
-	    String logMessage = prepareLogMessage(message);
-	    saveLog(logMessage);
+	    logMessage = message;
 	}
 	
 	private void updateContact() throws IOException {
@@ -264,6 +260,7 @@ public class AddressBook {
 			
 			System.out.println("Street: " + street);
 		    String newStreet = sc.nextLine();
+		    newStreet = newStreet.trim().replaceAll("\\s+"," ");
 		    // If user types in a new name, update the current name.
 		    if (!isEmpty(newStreet)) {
 		    	contact.put("street", newStreet);
@@ -272,6 +269,7 @@ public class AddressBook {
 		    
 		    System.out.println("City: " + city);
 		    String newCity = sc.nextLine();
+		    newCity = newCity.trim().replaceAll("\\s+"," ");
 		    // If user types in a new name, update the current name.
 		    if (!isEmpty(newCity)) {
 		    	contact.put("city", newCity);
@@ -324,15 +322,14 @@ public class AddressBook {
 			message += fullName + " " + 
 					street + ", " + city + " " + state + " " + zip + " " + 
 					phoneNumber;
+			logMessage = message;
 			
 			updateAddressBook();
-			
-			String logMessage = prepareLogMessage(message);
-			saveLog(logMessage);
 			
 			return;
 		}
 		
+		sc.close();
 		System.out.println("Contact ID does not exist in the address book.");
 	}
 	
@@ -359,31 +356,13 @@ public class AddressBook {
 					phoneNumber;
 			
 			addresses.remove(contactId);
+			logMessage = message;
 			updateAddressBook();
-			
-			String logMessage = prepareLogMessage(message);
-			saveLog(logMessage);
 			
 			return;
 		}
 		
 		System.out.println("Contact ID does not exist in the address book.");
-	}
-	
-	private String prepareLogMessage(String message) {
-		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new java.util.Date());
-		String logMessage = timeStamp + " ";
-		logMessage += message;
-		return logMessage;
-	}
-	
-	private void saveLog(String log) {
-		try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(LOG_FILE, true)))) {
-		    out.println(log);
-		    System.out.println(log);
-		} catch (IOException e) {
-		    System.err.println(e);
-		}
 	}
 	
 	private String addHyphen(String phoneNumber) {
@@ -409,17 +388,6 @@ public class AddressBook {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(ADDRESS_BOOK_FILE));
 	    writer.write(newAddressBookStr);
 	    writer.close();
-	}
-	
-	private void printHashMap() {
-		// Print hashmap:
-	    for(Map.Entry<String, HashMap<String, String>> addresses : addresses.entrySet()){
-	        String contactId = addresses.getKey();
-	        System.out.println("ID: " + contactId);
-	        for (Map.Entry<String, String> entry : addresses.getValue().entrySet())
-	          System.out.println(entry.getKey()+ ": " + entry.getValue());
-	        System.out.println("");
-	    }
 	}
 	
 	private boolean isEmpty(String input) {
